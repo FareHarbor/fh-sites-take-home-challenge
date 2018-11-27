@@ -2,7 +2,7 @@
 
 #### Make sure you are in the `/challenge-js` directory.
 
-This repository includes a `package.json` file which will install PHPUnit. [If you don't have npm, you can find instructions on installing it here.](https://www.npmjs.com/get-npm) It also includes a default mocha configuration. After running `npm install` you should be able to run:
+This repository includes a `package.json` file which will install Mocha. [If you don't have npm, you can find instructions on installing it here.](https://www.npmjs.com/get-npm) It also includes a default mocha configuration. After running `npm install` you should be able to run:
 
 - `npm test`
 
