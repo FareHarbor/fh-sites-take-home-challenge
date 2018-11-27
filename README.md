@@ -1,4 +1,4 @@
-<h2>Congratulations for making it to the next stage of the FareHarbor Sites interview!</h2>
+<h2>Congratulations on making it to the next stage of the FareHarbor Sites interview!</h2>
 
 This challenge is designed to give us a sense of your style as a programmer as well as your ability to solve problems.
 
