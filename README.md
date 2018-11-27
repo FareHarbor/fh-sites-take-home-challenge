@@ -12,4 +12,4 @@ This is what you'll need to do to submit your challenge:
 1. Fork this repo
 2. Once you're finished, email us a link to your repo
 
-The challenge is available in both php and js. Please refer to [`/challenge-js/README.md`](/challenge-js/README.md) or [`/challenge-php/README.md`](/challenge-php/README.md) for more information.
+The challenge is available in both php and js. Please refer to the [JS README](https://github.com/FareHarbor/fh-sites-take-home-challenge/tree/master/challenge-js) or the [PHP README](https://github.com/FareHarbor/fh-sites-take-home-challenge/tree/master/challenge-php) for more information.

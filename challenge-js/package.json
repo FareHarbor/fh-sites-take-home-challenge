@@ -1,0 +1,26 @@
+{
+  "name": "fh-sites-take-home-challenge-js",
+  "version": "1.0.0",
+  "description": "Coding Challenge for FareHarbor Sites JS Interview",
+  "main": "src/pokerHand.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": "^5.2.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/FareHarbor/fh-sites-take-home-challenge.git"
+  },
+  "author": "Adam Hundley <adamhundley@fareharbor.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FareHarbor/fh-sites-take-home-challenge/issues"
+  },
+  "homepage": "https://github.com/FareHarbor/fh-sites-take-home-challenge/challenge-js#readme"
+}

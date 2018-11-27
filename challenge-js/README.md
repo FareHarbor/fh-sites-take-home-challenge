@@ -1,15 +1,15 @@
-<h2>PHP Take Home Challenge</h2>
+<h2>JS Take Home Challenge</h2>
 
-#### Make sure you are in the `/challenge-php` directory.
+#### Make sure you are in the `/challenge-js` directory.
 
-This repository includes a `composer.json` file which will install PHPUnit. [If you don't have composer, you can find instructions on installing it here.](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-macos) It also includes a default phpunit configuration. After running `composer install` you should be able to run:
+This repository includes a `package.json` file which will install PHPUnit. [If you don't have npm, you can find instructions on installing it here.](https://www.npmjs.com/get-npm) It also includes a default mocha configuration. After running `npm install` you should be able to run:
 
-- `composer test-poker`
+- `npm test`
 
 Please be sure all included unit tests are passing before you submit your solution.
 
 # Poker Hand Ranker
-To run the provided tests, run `composer test-poker`.
+To run the provided tests, run `npm test`.
 
 Write code that will take in a poker hand, evaluate it and determine its
 rank.
