@@ -1,0 +1,29 @@
+{
+  "name": "fareharbor/fh-sites-take-home-challenge/challenge-php",
+  "description": "Coding challenge for FareHarbor Sites PHP Interview",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Adam Hundley",
+      "email": "adamhundley@fareharbor.com"
+    }
+  ],
+  "require": {
+    "phpunit/phpunit": "7.3.5"
+  },
+  "scripts": {
+    "phpunit": "phpunit --verbose --colors=always",
+    "test-poker": [
+      "phpunit --verbose --colors=always test/PokerHandTest.php"
+    ],
+    "test-all": [
+      "@phpunit"
+    ]
+  },
+  "autoload": {
+    "psr-4": {
+      "PokerHand\\": "src/PokerHand"
+    }
+  }
+}
