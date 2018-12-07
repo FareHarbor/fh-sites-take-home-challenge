@@ -64,6 +64,10 @@ class PokerHand {
       return 'Three of A Kind';
     }
 
+    if (this.cardTypes.aceCount === 4) {
+      return 'Four of A Kind';
+    }
+
     if (this.cardTypes.kingCount === 2 && this.cardTypes.threeCount === 2) {
       return 'Two Pair';
     }
