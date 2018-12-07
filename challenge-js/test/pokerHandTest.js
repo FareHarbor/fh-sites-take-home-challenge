@@ -44,4 +44,11 @@ describe('Rank A Flush', function() {
   });
 });
 
+describe('Three of A Kind', function() {
+  var hand = new PokerHand('Ah As Ad 2h 9h');
+
+  it('Return Three of A Kind when hand given', function() {
+    assert.equal(hand.getRank(), 'Three of A Kind');
+  });
+});
 // More tests go here
