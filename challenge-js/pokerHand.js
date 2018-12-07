@@ -1,7 +1,13 @@
 class PokerHand {
   constructor(cards) {
     this.cards = cards;
-    this.cardType = {
+    this.suitTypes = {
+      heartCount: 0,
+      spadeCount: 0,
+      clubCount: 0,
+      diamondCount: 0
+    };
+    this.cardTypes = {
       aceCount: 0,
       kingCount: 0,
       threeCount: 0
@@ -15,34 +21,42 @@ class PokerHand {
 
     userCards.forEach(card => {
       if (card.includes('A')) {
-        return this.cardType.aceCount++;
+        return this.cardTypes.aceCount++;
       }
     });
 
     userCards.forEach(card => {
       if (card.includes('K')) {
-        return this.cardType.kingCount++;
+        return this.cardTypes.kingCount++;
       }
     });
 
     userCards.forEach(card => {
       if (card.includes('3')) {
-        return this.cardType.threeCount++;
+        return this.cardTypes.threeCount++;
       }
     });
 
-    if (this.cardType.aceCount === 2) {
+    userCards.forEach(card => {
+      if (card.includes('h')) {
+        return this.suitTypes.heartCount++;
+      }
+    });
+
+    if (this.cardTypes.aceCount === 2) {
       return 'One Pair';
     }
 
-    if (this.cardType.aceCount === 3) {
-      return 'Three of A Kind!';
+    if (this.cardTypes.aceCount === 3) {
+      return 'Three of A Kind';
     }
 
-    if (this.cardType.kingCount === 2 && this.cardType.threeCount === 2) {
+    if (this.cardTypes.kingCount === 2 && this.cardTypes.threeCount === 2) {
       return 'Two Pair';
+    }
+
+    if (this.suitTypes.heartCount === 5) {
+      return 'Flush';
     }
   }
 }
-
-module.exports = PokerHand;
