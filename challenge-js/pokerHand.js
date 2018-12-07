@@ -17,8 +17,6 @@ class PokerHand {
   getRank() {
     var userCards = this.cards.split(' ');
 
-    console.log(userCards);
-
     if (userCards.length !== 5) return;
 
     userCards.forEach(card => {
@@ -62,5 +60,3 @@ class PokerHand {
     }
   }
 }
-
-module.exports = PokerHand;
