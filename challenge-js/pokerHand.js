@@ -1,6 +1,7 @@
 class PokerHand {
   constructor(cards) {
     this.cards = cards;
+    this.royal = false;
     this.suitTypes = {
       heartCount: 0,
       spadeCount: 0,
@@ -43,6 +44,18 @@ class PokerHand {
       }
     });
 
+    userCards.forEach(card => {
+      if (card.includes('s')) {
+        return this.suitTypes.spadeCount++;
+      }
+    });
+
+    userCards.forEach(card => {
+      if (card.includes('A' && 'K' && 'Q' && 'J' && '10')) {
+        this.royal = true;
+      }
+    });
+
     if (this.cardTypes.aceCount === 2) {
       return 'One Pair';
     }
@@ -58,5 +71,12 @@ class PokerHand {
     if (this.suitTypes.heartCount === 5) {
       return 'Flush';
     }
+
+    if (this.suitTypes.spadeCount === 5 && this.royal === true) {
+      this.royal = false;
+      return 'Royal Flush';
+    }
   }
 }
+
+module.exports = PokerHand;
