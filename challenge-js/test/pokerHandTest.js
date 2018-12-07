@@ -51,4 +51,12 @@ describe('Three of A Kind', function() {
     assert.equal(hand.getRank(), 'Three of A Kind');
   });
 });
+
+describe('Four of A Kind', function() {
+  var hand = new PokerHand('Ah As Ad Ac 9h');
+
+  it('Return Four of A Kind when hand given', function() {
+    assert.equal(hand.getRank(), 'Four of A Kind');
+  });
+});
 // More tests go here
