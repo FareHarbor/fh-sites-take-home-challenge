@@ -6,60 +6,59 @@ error_reporting(E_ALL);
 class PokerHand
 {
   public $cardsString;
-  public static $cardsArray = array();
+  public $cardsArray;
 
   //stores how many cards of each suit are in the hand
-  public static $suitsArray = array(
-        "d" => 0,
-        "h" => 0,
-        "c" => 0,
-        "s" => 0,
-  );
+  public $suitsArray;
 
   //stores how many cards of each value are in the hand
-  public static $valuesArray = array
-  (
-        "2" => 0,
-        "3" => 0,
-        "4" => 0,
-        "5" => 0,
-        "6" => 0,
-        "7" => 0,
-        "8" => 0,
-        "9" => 0,
-        "10" => 0,
-        "11" => 0,
-        "12" => 0,
-        "13" => 0,
-        "14" => 0,
-  );
+  public $valuesArray;
 
       public function __construct($hand)
       {
+        $this->valuesArray = array
+       (
+             "2" => 0,
+             "3" => 0,
+             "4" => 0,
+             "5" => 0,
+             "6" => 0,
+             "7" => 0,
+             "8" => 0,
+             "9" => 0,
+             "10" => 0,
+             "11" => 0,
+             "12" => 0,
+             "13" => 0,
+             "14" => 0,
+       );
+
+       $this->suitsArray = array(
+            "d" => 0,
+            "h" => 0,
+            "c" => 0,
+            "s" => 0,
+      );
 //divides string into array
         $this->cardsString = explode(" ", $hand);
 
+
 //creates new card objects, pushes to cards array
-        self::$cardsArray[] = new Card($this->cardsString[0]);
-        self::$cardsArray[] = new Card($this->cardsString[1]);
-        self::$cardsArray[] = new Card($this->cardsString[2]);
-        self::$cardsArray[] = new Card($this->cardsString[3]);
-        self::$cardsArray[] = new Card($this->cardsString[4]);
+        $this->cardsArray = array();
+        $this->cardsArray[] = new Card($this->cardsString[0]);
+        $this->cardsArray[] = new Card($this->cardsString[1]);
+        $this->cardsArray[] = new Card($this->cardsString[2]);
+        $this->cardsArray[] = new Card($this->cardsString[3]);
+        $this->cardsArray[] = new Card($this->cardsString[4]);
 
         $this->consolidateSuits();
         $this->consolidateValues();
-
-//prints cards
-        $this->printCards();
-
-        echo $this->getRank();
-        //echo  $this->compareSuits($this->card1, $this->card2);
       }
 
-      private function getRank()
+      public function getRank()
       {
           if ($this->testRoyalFlush()){
-            return "Royal Flush!";
+            return "Royal Flush";
           } else if ($this->testStraightFlush()){
             return "Straight Flush";
           } else if ($this->test4oak()){
@@ -75,7 +74,7 @@ class PokerHand
           } else if ($this->test2pair()){
             return "Two Pair";
           } else if ($this->testPair()){
-            return "Pair";
+            return "One Pair";
           } else {
             return "High Card";
           }
@@ -91,15 +90,15 @@ class PokerHand
       }
 
       public function test4oak(){
-          return (array_search(4, self::$valuesArray));
+          return (array_search(4, $this->valuesArray));
       }
 
       public function testFullHouse(){
-        return (array_search(3, self::$valuesArray) && array_search(2, self::$valuesArray));
+        return (array_search(3, $this->valuesArray) && array_search(2, $this->valuesArray));
       }
 
       public function testFlush(){
-        foreach (self::$suitsArray as $suit => $total){
+        foreach ($this->suitsArray as $suit => $total){
           if ($total==5){
             return true;
           }
@@ -109,7 +108,7 @@ class PokerHand
 
       public function testStraight($start = 2){
         for ($i=$start; $i<=10; $i++){
-          if (self::$valuesArray[$i] == 1 && self::$valuesArray[$i + 1] == 1 && self::$valuesArray[$i + 2] == 1 && self::$valuesArray[$i + 3] == 1 && self::$valuesArray[$i + 4] == 1){
+          if ($this->valuesArray[$i] == 1 && $this->valuesArray[$i + 1] == 1 && $this->valuesArray[$i + 2] == 1 && $this->valuesArray[$i + 3] == 1 && $this->valuesArray[$i + 4] == 1){
             return true;
           }
         }
@@ -117,18 +116,18 @@ class PokerHand
       }
 
       public function test3oak(){
-        return (array_search(3, self::$valuesArray) && array_search(2, self::$valuesArray) == 0);
+        return (array_search(3, $this->valuesArray) && array_search(2, $this->valuesArray) == 0);
       }
 
       public function test2pair(){
-        $temp = array_count_values(self::$valuesArray);
+        $temp = array_count_values($this->valuesArray);
         if (count($temp) > 2){
         return ($temp[2] == 2);
       }
       }
 
       public function testPair(){
-        $temp = array_count_values(self::$valuesArray);
+        $temp = array_count_values($this->valuesArray);
         if (count($temp) > 2){
         return ($temp[2] == 1);
       }
@@ -136,20 +135,20 @@ class PokerHand
 
 //iterates through cards and counts how many of each suit there are, stores in suitsArray
       public function consolidateSuits(){
-        foreach (self::$cardsArray as $card){
-          self::$suitsArray[strtolower($card->getSuit())]++;
+        foreach ($this->cardsArray as $card){
+          $this->suitsArray[strtolower($card->getSuit())]++;
         }
       }
 //iterates through cards and counts how many of each value there are , stores in valuesarray
       public function consolidateValues(){
-            foreach (self::$cardsArray as $card){
-              self::$valuesArray[$card->getValue()]++;
+            foreach ($this->cardsArray as $card){
+              $this->valuesArray[$card->getValue()]++;
             }
       }
 
 //prints cards in hand
       public function printCards(){
-        foreach (self::$cardsArray as $card){
+        foreach ($this->cardsArray as $card){
             echo $card->getValue() . " of " . $card->getSuit() . " </br> ";
         }
       }
@@ -207,6 +206,9 @@ public function getCard(){
 }
 }
 
-$myHand = new PokerHand('9s 9S jS Qs js');
+
+$hand2 = new PokerHand('Ah As 10c 7d 6s');
+$hand3 = new PokerHand('Kh Kc 3s 3h 2d');
+$hand4 = new PokerHand('Kh Qh 6h 2h 9h');
 
 ?>
