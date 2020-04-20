@@ -7,31 +7,14 @@ class PokerHand
 {
   public $cardsString;
   public $cardsArray;
-
   //stores how many cards of each suit are in the hand
   public $suitsArray;
-
   //stores how many cards of each value are in the hand
   public $valuesArray;
-
       public function __construct($hand)
       {
-        $this->valuesArray = array
-       (
-             "2" => 0,
-             "3" => 0,
-             "4" => 0,
-             "5" => 0,
-             "6" => 0,
-             "7" => 0,
-             "8" => 0,
-             "9" => 0,
-             "10" => 0,
-             "11" => 0,
-             "12" => 0,
-             "13" => 0,
-             "14" => 0,
-       );
+//initialize values array to have 13 keys, starting at index 2, all set to 0
+      $this->valuesArray = array_fill(2, 13, 0);
 
        $this->suitsArray = array(
             "d" => 0,
@@ -42,17 +25,15 @@ class PokerHand
 //divides string into array
         $this->cardsString = explode(" ", $hand);
 
-
-//creates new card objects, pushes to cards array
+//creates a new card element for each element in cardString, pushes onto cards array
         $this->cardsArray = array();
-        $this->cardsArray[] = new Card($this->cardsString[0]);
-        $this->cardsArray[] = new Card($this->cardsString[1]);
-        $this->cardsArray[] = new Card($this->cardsString[2]);
-        $this->cardsArray[] = new Card($this->cardsString[3]);
-        $this->cardsArray[] = new Card($this->cardsString[4]);
+        for ($i = 0; $i<5; $i++){
+          $this->cardsArray[] = new Card($this->cardsString[$i]);
+        }
 
         $this->consolidateSuits();
         $this->consolidateValues();
+        echo $this->getRank() . "</br>";
       }
 
       public function getRank()
@@ -62,15 +43,15 @@ class PokerHand
           } else if ($this->testStraightFlush()){
             return "Straight Flush";
           } else if ($this->test4oak()){
-            return "4 of a kind";
+            return "Four of a Kind";
           } else if ($this->testFullHouse()){
             return "Full House";
           } else if ($this->testFlush()){
             return "Flush";
-          } else if ($this->testStraight()){
+          } else if ($this->testStraight() || $this->testEvilStraight()){
             return "Straight";
           } else if ($this->test3oak()){
-            return "Three of a kind";
+            return "Three of a Kind";
           } else if ($this->test2pair()){
             return "Two Pair";
           } else if ($this->testPair()){
@@ -86,7 +67,7 @@ class PokerHand
       }
 
       public function testStraightFlush(){
-        return ($this->testStraight() && $this->testFlush());
+        return (($this->testStraight() || $this->testEvilStraight()) && $this->testFlush());
       }
 
       public function test4oak(){
@@ -98,12 +79,11 @@ class PokerHand
       }
 
       public function testFlush(){
-        foreach ($this->suitsArray as $suit => $total){
-          if ($total==5){
-            return true;
-          }
-        }
-        return false;
+        return (array_search(5, $this->suitsArray));
+      }
+
+      public function testEvilStraight(){
+        return ($this->valuesArray[14] == 1 && $this->valuesArray[2] == 1 && $this->valuesArray[3] == 1 && $this->valuesArray[4] == 1 && $this->valuesArray[5] == 1);
       }
 
       public function testStraight($start = 2){
@@ -112,11 +92,12 @@ class PokerHand
             return true;
           }
         }
+
         return false;
       }
 
       public function test3oak(){
-        return (array_search(3, $this->valuesArray) && array_search(2, $this->valuesArray) == 0);
+        return (array_search(3, $this->valuesArray));
       }
 
       public function test2pair(){
@@ -153,13 +134,11 @@ class PokerHand
         }
       }
 }
-
 //class for each card, contains a value and suit property
 class Card
 {
 public $value;
 public $suit;
-
 //takes in short string and sets value and suit based on character and position in string
   public function __construct($card){
     //handles face cards
@@ -191,7 +170,6 @@ public $suit;
           $this->suit = $card[2];
       }
   }
-
 //helper functions
   public function getValue(){
     return $this->value;
@@ -206,9 +184,6 @@ public function getCard(){
 }
 }
 
-
-$hand2 = new PokerHand('Ah As 10c 7d 6s');
-$hand3 = new PokerHand('Kh Kc 3s 3h 2d');
-$hand4 = new PokerHand('Kh Qh 6h 2h 9h');
+$hand = new PokerHand('As Ks 2s 3s 7d');
 
 ?>
