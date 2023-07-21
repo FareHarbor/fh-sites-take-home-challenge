@@ -36,7 +36,7 @@ class PokerHand
         $isFlush = count(array_keys($sortedHand)) == 1;
         $rank = $this->getSequentialRank($cardValues, $isFlush);
 
-        return empty($rank) ? self::$rankText[9] || $rank;
+        return empty($rank) ? $this->checkCardMatchRank($cardValues) : $rank;
         
     }
 
@@ -154,5 +154,51 @@ class PokerHand
         }
         
     }
+
+     /*
+    *
+    * Determines if the cards in a hand have matches that pairs, three of a kind, full house, 
+    * or four of a kind and returns the string value ranking of the card.
+    *
+    * @return rank - the string representation of the hand rank - String
+    */
+    private function checkCardMatchRank($cardValues){
+        $cardMatches = array_count_values($cardValues);
+        $isThreeKind = false;
+        $isPair = false;
+        $isTwoPair = false;
+        foreach ($cardMatches as $key => $count){
+            if($count == 4){
+                return self::$rankText[2];
+            }
+            if($count == 3){
+                $isThreeKind = true;
+            }
+            if($count == 2){
+                if($isPair){
+                    $isTwoPair = true;
+                }else{
+                    $isPair = true;
+                }
+            }
+        }
+        if($isPair && $isThreeKind){
+            return self::$rankText[3];
+        }
+        else if($isThreeKind){
+            return self::$rankText[6];
+        }
+        else if($isTwoPair){
+            return self::$rankText[7];
+        }
+        else if($isPair){
+            return self::$rankText[8];
+        }
+        else{
+            return self::$rankText[9];
+        }
+
+    }
+
 
 }
