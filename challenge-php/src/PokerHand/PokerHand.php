@@ -32,7 +32,8 @@ class PokerHand
     {
 
         $sortedHand = $this->processHand();
-        return "High Card";
+        $isFlush = count(array_keys($sortedHand)) == 1;
+        return $isFlush ? self::$rankText[4] || self::$rankText[9];
         
     }
 
