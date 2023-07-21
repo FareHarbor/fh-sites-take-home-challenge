@@ -136,5 +136,13 @@ class PokerHandTest extends TestCase
         $hand->getRank();
     }
 
+    /**
+     * @test
+     */
+    public function invalidDuplicateCard(){
+        $hand = new PokerHand('Kc Kc 3h 6d 5d');
+        $this->expectException(PokerHandException::class);
+        $hand->getRank();
+    }
 
 }

@@ -22,18 +22,17 @@ class PokerHand
         $this->pokerHand = explode(' ', $hand);
     }
 
-
     /*
     * Determines the rank of a 5 card poker hand
     *
+    * @return rank - card ranking text - String
     */
-
     public function getRank()
     {
 
         $sortedHand = $this->processHand();
         $cardValues = array_merge(...array_values($sortedHand));
-        $isFlush = count(array_keys($sortedHand)) == 1;
+        $isFlush = count(array_keys($sortedHand)) === 1;
         $rank = $this->getSequentialRank($cardValues, $isFlush);
 
         return empty($rank) ? $this->checkCardMatchRank($cardValues) : $rank;
@@ -46,7 +45,7 @@ class PokerHand
     *
     */
     private function validateHand($hand){
-        if(!is_string($hand) || !(substr_count(trim($hand), ' ') == 4)){
+        if(!is_string($hand) || !(substr_count(trim($hand), ' ') === 4)){
             error_log("Invalid Hand Format: $hand");
             throw new PokerHandException("Invalid Hand Format");
         }
@@ -71,7 +70,11 @@ class PokerHand
             if(empty($sortedHand[$suit])){
                 $sortedHand[$suit] = [];
             }
-            array_push($sortedHand[$suit], intVal($cardValue));
+            if(in_array($cardValue, $sortedHand[$suit])){
+                error_log("Duplicate Card: $suit, $cardValue");
+                throw new PokerHandException("Duplicate Card");
+            }
+            array_push($sortedHand[$suit], $cardValue);
         }
         return $sortedHand;
     }
@@ -107,12 +110,16 @@ class PokerHand
             error_log("Invalid Card Value: $cardValue");
             throw new PokerHandException("Invalid Card Value");
         }
-        return $cardValue;
+        return intVal($cardValue);
     }
 
  /*
     * Determines whether the cardvalues in a hand are in sequential order and whether or not they are
     * sequential high cards.
+    *
+    *  @param - cardValues - array of card values - int[]
+    *  @param - isFlush - if the hand has a flush - bool 
+    *  @return rank - rank of the hand or empty string - string
     */
     private function getSequentialRank($cardValues, $isFlush){
         
@@ -160,6 +167,7 @@ class PokerHand
     * Determines if the cards in a hand have matches that pairs, three of a kind, full house, 
     * or four of a kind and returns the string value ranking of the card.
     *
+    * @param cardValues - array of card values - int[]
     * @return rank - the string representation of the hand rank - String
     */
     private function checkCardMatchRank($cardValues){
@@ -199,6 +207,4 @@ class PokerHand
         }
 
     }
-
-
 }
