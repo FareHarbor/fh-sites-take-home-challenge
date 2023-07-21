@@ -14,7 +14,7 @@ class PokerHandTest extends TestCase
         $this->assertEquals('Royal Flush', $hand->getRank());
     }
 
-        /**
+   /**
      * @test
      */
     public function itCanRankAStraightFlush()
@@ -29,7 +29,7 @@ class PokerHandTest extends TestCase
     public function itCanRankFourKind()
     {
         $hand = new PokerHand('Ah As Ac Ad 6h');
-        $this->assertEquals('Three of a Kind', $hand->getRank());
+        $this->assertEquals('Four of a Kind', $hand->getRank());
     }
 
     /**
@@ -93,5 +93,48 @@ class PokerHandTest extends TestCase
         $this->assertEquals('High Card', $hand->getRank());
     }
 
-    // TODO: More tests go here
+    /**
+     * @test
+     */
+    public function invalidHandFormat(){
+        $this->expectException(PokerHandException::class);
+        $hand = new PokerHand('asdflkajvg');
+    }
+
+    /**
+     * @test
+     */
+    public function invalidHandSize(){
+        $this->expectException(PokerHandException::class);
+        $hand = new PokerHand('Kt 2c 3h 6d 5d 9d');
+    }
+
+    /**
+     * @test
+     */
+    public function invalidCardSuit(){
+        $hand = new PokerHand('Kt 2c 3h 6d 5d');
+        $this->expectException(PokerHandException::class);
+        $hand->getRank();
+    }
+
+    /**
+     * @test
+     */
+    public function invalidCardNumericValue(){
+        $hand = new PokerHand('Kc 1c 3h 6d 5d');
+        $this->expectException(PokerHandException::class);
+        $hand->getRank();
+    }
+
+    /**
+     * @test
+     */
+    public function invalidCardFaceValue(){
+        $hand = new PokerHand('Kc Lc 3h 6d 5d');
+        $this->expectException(PokerHandException::class);
+        $hand->getRank();
+    }
+
+
 }
