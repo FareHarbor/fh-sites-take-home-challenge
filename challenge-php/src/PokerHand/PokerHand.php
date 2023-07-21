@@ -213,10 +213,7 @@ class PokerHand
 
         if($isThreeKind)
         {
-            if($isPair){
-                return self::$rankHierarchy[3];
-            }
-            return self::$rankHierarchy[6];
+            return $isPair ?  self::$rankHierarchy[3] : self::$rankHierarchy[6];
         }
 
         if($isTwoPair)
