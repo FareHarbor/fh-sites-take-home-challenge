@@ -93,7 +93,18 @@ class PokerHandTest extends TestCase
         $this->assertEquals('High Card', $hand->getRank());
     }
 
+
     /**
+     *  Test for invalid hand format
+     * @test
+     */
+    public function invalidHandFormatNonString(){
+        $this->expectException(PokerHandException::class);
+        $hand = new PokerHand(123123);
+    }
+
+    /**
+     *  Test for invalid hand format
      * @test
      */
     public function invalidHandFormat(){
@@ -102,6 +113,8 @@ class PokerHandTest extends TestCase
     }
 
     /**
+     * 
+     *  Test for invalid hand size
      * @test
      */
     public function invalidHandSize(){
@@ -119,6 +132,8 @@ class PokerHandTest extends TestCase
     }
 
     /**
+     * 
+     *  Test for invalid numeric card value
      * @test
      */
     public function invalidCardNumericValue(){
@@ -128,6 +143,8 @@ class PokerHandTest extends TestCase
     }
 
     /**
+     * 
+     *  Test for invalid face card
      * @test
      */
     public function invalidCardFaceValue(){
@@ -137,6 +154,8 @@ class PokerHandTest extends TestCase
     }
 
     /**
+     * 
+     *  Test for duplicate cards
      * @test
      */
     public function invalidDuplicateCard(){
