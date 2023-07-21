@@ -7,7 +7,7 @@ class PokerHandException extends \Exception {};
 class PokerHand
 {
 
-    private static $rankText = ['Royal Flush','Straight Flush','Four of a Kind',
+    private static $rankHierarchy = ['Royal Flush','Straight Flush','Four of a Kind',
     'Full House','Flush','Straight','Three of a Kind','Two Pair','One Pair','High Card'];
 
     private static $faceValue = ['J' => 11,'Q' => 12,'K' => 13,'A' => 14];
@@ -23,7 +23,13 @@ class PokerHand
     }
 
     /*
-    * Determines the rank of a 5 card poker hand
+    * Determines the rank of a 5 card poker hand.
+    *
+    * Checks are split into 2 groups: Sequential & Flushes and Card Matches
+    * 
+    * sequential ranks are checked first as they are higher ranked and you cannot have both a flush and 
+    * higher ranked matching value hand.  Only perform checks on matches if the previous ranking check returns an
+    * empty string rank.
     *
     * @return rank - card ranking text - String
     */
@@ -32,9 +38,9 @@ class PokerHand
 
         $sortedHand = $this->processHand();
         $cardValues = array_merge(...array_values($sortedHand));
-        $isFlush = count(array_keys($sortedHand)) === 1;
+        $isFlush =  count(array_keys($sortedHand)) === 1;
         $rank = $this->getSequentialRank($cardValues, $isFlush);
-
+        
         return empty($rank) ? $this->checkCardMatchRank($cardValues) : $rank;
         
     }
@@ -44,8 +50,10 @@ class PokerHand
     * of a space delinated string, with 5 substrings. Throws PokerHandException if invalid.
     *
     */
-    private function validateHand($hand){
-        if(!is_string($hand) || !(substr_count(trim($hand), ' ') === 4)){
+    private function validateHand($hand)
+    {
+        if(!is_string($hand) || !(substr_count(trim($hand), ' ') === 4))
+        {
             error_log("Invalid Hand Format: $hand");
             throw new PokerHandException("Invalid Hand Format");
         }
@@ -55,15 +63,17 @@ class PokerHand
     * Process the poker hand array into a assoc. array with the suits as keys
     * and the numeric values of the cards as array values.  
     *
-    * @return sortedHand - hand sorted by suit and card value - associative array [string => [int]]
+    * ex: [Ac, Kh, 3h, 7c, 2d] will return [c => [14, 7], d=> [2], h => [13, 3]]
+    *
+    * @return sortedHand - cards in hand grouped by suit - associative array [string => [int]]
     *
     */
-    private function processHand(){
+    private function processHand()
+    {
         
         $sortedHand = [];
         foreach($this->pokerHand as $card)
         {
-
             $suit = $this->getSuit($card);
             $cardValue = $this->getNumericCardValue($card);
             
@@ -84,12 +94,14 @@ class PokerHand
      * 
      * @return suit - suit letter - string
      */
-    private function getSuit($card){
+    private function getSuit($card)
+    {
         $suit = substr($card, -1);
-            if (!in_array($suit, self::$suits)){
-                error_log("Invalid Suit: $suit");
-                throw new PokerHandException("Invalid Suit");
-            }
+        if (!in_array($suit, self::$suits))
+        {
+            error_log("Invalid Suit: $suit");
+            throw new PokerHandException("Invalid Suit");
+        }
         return $suit;
     }
 
@@ -99,17 +111,21 @@ class PokerHand
     *
     * @return value - numeric card value - int 
     */
-    private function getNumericCardValue($card){
+    private function getNumericCardValue($card)
+    {
         $cardValue = strtoupper(substr($card, 0, -1));   
                         
-        if(isset(self::$faceValue[$cardValue])){
+        if(isset(self::$faceValue[$cardValue]))
+        {
             $cardValue = self::$faceValue[$cardValue];
         }
 
-        if ($cardValue < 2) {
+        if ($cardValue < 2)
+        {
             error_log("Invalid Card Value: $cardValue");
             throw new PokerHandException("Invalid Card Value");
         }
+
         return intVal($cardValue);
     }
 
@@ -121,7 +137,8 @@ class PokerHand
     *  @param - isFlush - if the hand has a flush - bool 
     *  @return rank - rank of the hand or empty string - string
     */
-    private function getSequentialRank($cardValues, $isFlush){
+    private function getSequentialRank($cardValues, $isFlush)
+    {
         
         $sortedValues = $cardValues;
         sort($sortedValues);
@@ -133,7 +150,12 @@ class PokerHand
         
         for($i=1; $i<sizeof($sortedValues); $i++)
         { 
+            
             if ($sortedValues[$i] != $previousValue+1){
+                //edge case for Ace low straight
+                if($sortedValues[$i] === 14 && $sortedValues[0] === 2){
+                    break;
+                }
                 $isStraight = false; 
                 $isRoyal = false;
                 break;
@@ -141,24 +163,24 @@ class PokerHand
             $previousValue = $sortedValues[$i];
         }
         
-        if($isRoyal && $isFlush){
-            return self::$rankText[0];
+        if($isFlush)
+        {
+            if($isRoyal){
+                return self::$rankHierarchy[0];
+            }
+            if($isStraight){
+                return self::$rankHierarchy[1];
+            }
+
+            return self::$rankHierarchy[4];
         }
 
-        else if($isStraight && $isFlush){
-            return self::$rankText[1];
+        if($isStraight)
+        {
+            return self::$rankHierarchy[5];
         }
 
-        else if($isFlush){ 
-            return self::$rankText[4];
-        }
-
-        else if($isStraight){
-            return self::$rankText[5];
-        }
-        else{
-            return "";
-        }
+        return "";
         
     }
 
@@ -170,41 +192,48 @@ class PokerHand
     * @param cardValues - array of card values - int[]
     * @return rank - the string representation of the hand rank - String
     */
-    private function checkCardMatchRank($cardValues){
+    private function checkCardMatchRank($cardValues)
+    {
         $cardMatches = array_count_values($cardValues);
         $isThreeKind = false;
         $isPair = false;
         $isTwoPair = false;
-        foreach ($cardMatches as $key => $count){
-            if($count == 4){
-                return self::$rankText[2];
+        foreach ($cardMatches as $key => $count)
+        {
+            switch($count){
+                case 4:
+                    return self::$rankHierarchy[2];
+                case 3:
+                    $isThreeKind = true;
+                    break;
+                case 2:
+                    if($isPair){
+                        $isTwoPair = true;
+                    }else{
+                        $isPair = true;
+                    }
+                    break;
             }
-            if($count == 3){
-                $isThreeKind = true;
+        }
+
+        if($isThreeKind)
+        {
+            if($isPair){
+                return self::$rankHierarchy[3];
             }
-            if($count == 2){
-                if($isPair){
-                    $isTwoPair = true;
-                }else{
-                    $isPair = true;
-                }
-            }
+            return self::$rankHierarchy[6];
         }
-        if($isPair && $isThreeKind){
-            return self::$rankText[3];
+
+        if($isTwoPair)
+        {
+            return self::$rankHierarchy[7];
         }
-        else if($isThreeKind){
-            return self::$rankText[6];
+        if($isPair)
+        {
+            return self::$rankHierarchy[8];
         }
-        else if($isTwoPair){
-            return self::$rankText[7];
-        }
-        else if($isPair){
-            return self::$rankText[8];
-        }
-        else{
-            return self::$rankText[9];
-        }
+        
+        return self::$rankHierarchy[9];      
 
     }
 }

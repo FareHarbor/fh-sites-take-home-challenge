@@ -61,6 +61,15 @@ class PokerHandTest extends TestCase
 
     /**
      * @test
+     */
+    public function itCanRankAceLowStraight()
+    {
+        $hand = new PokerHand('2c 3s Ah 4d 5h');
+        $this->assertEquals('Straight', $hand->getRank());
+    }
+
+    /**
+     * @test
     */ 
     public function itCanRankThreeKind()
     {
@@ -92,7 +101,6 @@ class PokerHandTest extends TestCase
         $hand = new PokerHand('Kd 2c 3h 6d 5d');
         $this->assertEquals('High Card', $hand->getRank());
     }
-
 
     /**
      *  Test for invalid hand format
