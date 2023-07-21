@@ -32,8 +32,11 @@ class PokerHand
     {
 
         $sortedHand = $this->processHand();
+        $cardValues = array_merge(...array_values($sortedHand));
         $isFlush = count(array_keys($sortedHand)) == 1;
-        return $isFlush ? self::$rankText[4] || self::$rankText[9];
+        $rank = $this->getSequentialRank($cardValues, $isFlush);
+
+        return empty($rank) ? self::$rankText[9] || $rank;
         
     }
 
@@ -105,6 +108,51 @@ class PokerHand
             throw new PokerHandException("Invalid Card Value");
         }
         return $cardValue;
+    }
+
+ /*
+    * Determines whether the cardvalues in a hand are in sequential order and whether or not they are
+    * sequential high cards.
+    */
+    private function getSequentialRank($cardValues, $isFlush){
+        
+        $sortedValues = $cardValues;
+        sort($sortedValues);
+        $previousValue = $sortedValues[0];
+
+        //if first value in array is 10 all values are equal or higher
+        $isRoyal = $previousValue >= 10;
+        $isStraight = true;
+        
+        for($i=1; $i<sizeof($sortedValues); $i++)
+        { 
+            if ($sortedValues[$i] != $previousValue+1){
+                $isStraight = false; 
+                $isRoyal = false;
+                break;
+            }
+            $previousValue = $sortedValues[$i];
+        }
+        
+        if($isRoyal && $isFlush){
+            return self::$rankText[0];
+        }
+
+        else if($isStraight && $isFlush){
+            return self::$rankText[1];
+        }
+
+        else if($isFlush){ 
+            return self::$rankText[4];
+        }
+
+        else if($isStraight){
+            return self::$rankText[5];
+        }
+        else{
+            return "";
+        }
+        
     }
 
 }
