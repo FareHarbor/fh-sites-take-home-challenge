@@ -175,12 +175,7 @@ class PokerHand
             return self::$rankHierarchy[4];
         }
 
-        if($isStraight)
-        {
-            return self::$rankHierarchy[5];
-        }
-
-        return "";
+        return $isStraight ? self::$rankHierarchy[5] : "";
         
     }
 
@@ -228,12 +223,8 @@ class PokerHand
         {
             return self::$rankHierarchy[7];
         }
-        if($isPair)
-        {
-            return self::$rankHierarchy[8];
-        }
         
-        return self::$rankHierarchy[9];      
+        return $isPair ? self::$rankHierarchy[8] : self::$rankHierarchy[9];      
 
     }
 }
