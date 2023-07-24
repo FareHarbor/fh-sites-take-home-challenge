@@ -10,22 +10,22 @@ class PokerHandException extends \Exception
 class PokerHand
 {
 
-    private static $rankHierarchy = [
-        'Royal Flush',
-        'Straight Flush',
-        'Four of a Kind',
-        'Full House',
-        'Flush',
-        'Straight',
-        'Three of a Kind',
-        'Two Pair',
-        'One Pair',
-        'High Card'
-    ];
-
     private static $faceValue = ['J' => 11, 'Q' => 12, 'K' => 13, 'A' => 14];
 
     private static $suits = ['c', 'd', 'h', 's'];
+
+    private $rankHierarchy = [
+        'Royal Flush' => false,
+        'Straight Flush' => false,
+        'Four of a Kind' => false,
+        'Full House' => false,
+        'Flush' => false,
+        'Straight' => false,
+        'Three of a Kind' => false,
+        'Two Pair' => false,
+        'One Pair' => false,
+        'High Card' => true
+    ];
 
     private $pokerHand;
 
@@ -41,19 +41,25 @@ class PokerHand
      * Checks are split into 2 groups: Sequential & Flushes and Card Matches
      * 
      * sequential ranks are checked first as they are higher ranked and you cannot have both a flush and 
-     * higher ranked matching value hand.  Only perform checks on matches if the previous ranking check returns an
+     * higher ranked matching value hand ex. you cannot have a flush & 4 of a kind  Only perform checks on matches if the previous ranking check returns an
      * empty string rank.
      *
      * @return rank - card ranking text - String
      */
     public function getRank()
     {
-        $sortedHand = $this->processHand();
-        $cardValues = array_merge(...array_values($sortedHand));
-        $isFlush = count(array_keys($sortedHand)) === 1;
-        $rank = $this->getSequentialRank($cardValues, $isFlush);
+        $processedHand = $this->processHand();
+        $cardValues = array_merge(...array_values($processedHand));
+        $this->setRankHierarchy('Flush', count(array_keys($processedHand)) === 1);
+        $this->setSequentialRankFlags($cardValues);
+        $highRank = $this->getHighestRank();
 
-        return empty($rank) ? $this->checkCardMatchRank($cardValues) : $rank;
+        if ($highRank == 'High Card') {
+            $this->setCardMatchRankFlags($cardValues);
+            $highRank = $this->getHighestRank();
+        }
+
+        return $highRank;
     }
 
     /*
@@ -80,21 +86,21 @@ class PokerHand
      */
     private function processHand()
     {
-        $sortedHand = [];
+        $processedHand = [];
         foreach ($this->pokerHand as $card) {
             $suit = $this->getSuit($card);
             $cardValue = $this->getNumericCardValue($card);
 
-            if (empty($sortedHand[$suit])) {
-                $sortedHand[$suit] = [];
+            if (empty($processedHand[$suit])) {
+                $processedHand[$suit] = [];
             }
-            if (in_array($cardValue, $sortedHand[$suit])) {
+            if (in_array($cardValue, $processedHand[$suit])) {
                 error_log("Duplicate Card: $suit, $cardValue");
                 throw new PokerHandException("Duplicate Card");
             }
-            array_push($sortedHand[$suit], $cardValue);
+            array_push($processedHand[$suit], $cardValue);
         }
-        return $sortedHand;
+        return $processedHand;
     }
 
     /*
@@ -135,22 +141,17 @@ class PokerHand
     }
 
     /*
-     * Determines whether the cardvalues in a hand are in sequential order and whether or not they are
-     * sequential high cards.
+     * Determines whether the cardvalues in a hand are in sequential 
+     * order and whether or not they are sequential high cards. 
+     * Sorts the array of cardValues first and sets the flags if conditions are met.
      *
-     *  @param - cardValues - array of card values - int[]
-     *  @param - isFlush - if the hand has a flush - bool 
-     *  @return rank - rank of the hand or empty string - string
+     *  @param cardValues - array of card values - int[]
      */
-    private function getSequentialRank($cardValues, $isFlush)
+    private function setSequentialRankFlags($cardValues)
     {
         $sortedValues = $cardValues;
         sort($sortedValues);
         $previousValue = $sortedValues[0];
-
-        //if first value in array is 10 all values are equal or higher
-        $isRoyal = $previousValue >= 10;
-        $isStraight = true;
 
         for ($i = 1; $i < sizeof($sortedValues); $i++) {
 
@@ -159,66 +160,63 @@ class PokerHand
                 if ($sortedValues[$i] === 14 && $sortedValues[0] === 2) {
                     break;
                 }
-                $isStraight = false;
-                $isRoyal = false;
-                break;
+                return;
             }
             $previousValue = $sortedValues[$i];
         }
+        // if we reach here we at least have a straight
+        //if first value in array is 10 all values are equal or higher
+        $this->setRankHierarchy('Royal Flush', $sortedValues[0] === 10 && $this->rankHierarchy['Flush']);
+        $this->setRankHierarchy('Straight Flush', $this->rankHierarchy['Flush']);
+        $this->setRankHierarchy('Straight', true);
 
-        if ($isFlush) {
-            if ($isRoyal) {
-                return self::$rankHierarchy[0];
-            }
-            if ($isStraight) {
-                return self::$rankHierarchy[1];
-            }
-
-            return self::$rankHierarchy[4];
-        }
-
-        return $isStraight ? self::$rankHierarchy[5] : "";
     }
 
     /*
      *
-     * Determines if the cards in a hand have matches that pairs, three of a kind, full house, 
-     * or four of a kind and returns the string value ranking of the card.
+     * Determines if the cards in a hand have matches that pairs,
+     * three of a kind, full house, or four of a kind and sets the rank to true.
      *
-     * @param cardValues - array of card values - int[]
-     * @return rank - the string representation of the hand rank - String
+     * @param cardValues - array of card values - int[]fds
      */
-    private function checkCardMatchRank($cardValues)
+    private function setCardMatchRankFlags($cardValues)
     {
         $cardMatches = array_count_values($cardValues);
-        $isThreeKind = false;
-        $isPair = false;
-        $isTwoPair = false;
-        foreach ($cardMatches as $key => $count) {
+        foreach (array_values($cardMatches) as $count) {
             switch ($count) {
                 case 4:
-                    return self::$rankHierarchy[2];
+                    $this->setRankHierarchy('Four of a Kind', true);
+                    return;
                 case 3:
-                    $isThreeKind = true;
+                    $this->setRankHierarchy('Three of a Kind', true);
                     break;
                 case 2:
-                    if ($isPair) {
-                        $isTwoPair = true;
-                    } else {
-                        $isPair = true;
-                    }
+                    $this->rankHierarchy['One Pair'] ? $this->setRankHierarchy('Two Pair', true) : $this->setRankHierarchy('One Pair', true);
                     break;
             }
         }
+        $this->setRankHierarchy('Full House', $this->rankHierarchy['One Pair'] && $this->rankHierarchy['Three of a Kind']);
+    }
 
-        if ($isThreeKind) {
-            return $isPair ? self::$rankHierarchy[3] : self::$rankHierarchy[6];
-        }
+    /*
+     * 
+     * Helper function to find the highest rank that is set to true. 
+     *
+     * @return highest rank - String
+     */
+    private function getHighestRank()
+    {
+        return array_search(true, $this->rankHierarchy);
+    }
 
-        if ($isTwoPair) {
-            return self::$rankHierarchy[7];
-        }
-
-        return $isPair ? self::$rankHierarchy[8] : self::$rankHierarchy[9];
+    /*
+     * Helper function to set flag value for rank
+     *
+     *@param $key - key to update - String
+     *@param $value - value to set rank - bool
+     */
+    private function setRankHierarchy($key, $value)
+    {
+        $this->rankHierarchy[$key] = $value;
     }
 }
